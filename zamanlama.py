@@ -35,6 +35,12 @@ time_left = 5  # Oyuncunun kalan süresi
 left_time = 3600
 min_time = 2  # Süre 2 saniyenin altına düşmesin
 base_time = 5  # Süre sıfırlandığında geri döneceği değer
+kullanıcı_1 = True
+kullanıcı_2 = True
+old_m_sayi = 0
+old_k_sayi = 0
+m_hata = 0
+k_hata = 0
 
 
 def draw():
@@ -92,13 +98,15 @@ def draw():
             k_alt.y= 360
             k_alt.draw()                    
         screen.draw.text(f"Skor: {m_score}", topleft=(50, 50), color="black", fontsize=45)
-        screen.draw.text(f"Skor: {k_score}", topleft=(1600, 50), color="black", fontsize=45)  
-        screen.draw.text(f"Zaman: {int(left_time/ 60) }", (840, 50), fontsize=50, color="black") 
+        screen.draw.text(f"Skor: {k_score}", topleft=(1600, 50), color="black", fontsize=45) 
+        screen.draw.text(f"Hata: {m_hata}", topleft=(50, 100), color="black", fontsize=45)
+        screen.draw.text(f"Hata: {k_hata}", topleft=(1600, 100), color="black", fontsize=45) 
+        screen.draw.text(f"Zaman: {int(left_time/ 60) }", (840, 50), fontsize=50, color="black")     
     
 
 
 def on_key_down(key):
-    global m_score, m_sayi, death, mod, time_left, highscore , k_sayi , k_score
+    global m_score, m_sayi, death, mod, time_left, highscore , k_sayi , k_score , old_m_sayi , old_k_sayi, k_hata , m_hata
 
     if mod == 0 and keyboard.Q:
         mod = 1
@@ -111,7 +119,8 @@ def on_key_down(key):
             mod = 1
             reset_game()  # Oyunu sıfırla
         elif keyboard.R:
-            mod = 0    
+            mod = 0  
+            m_score = 0  
 
     if mod == 1:
         if keyboard.up or keyboard.right or keyboard.left or keyboard.down :
@@ -151,40 +160,90 @@ def on_key_down(key):
 
 
     if mod == 3:
-        if keyboard.W or keyboard.A or keyboard.S or keyboard.D :
-
-            if m_sayi == 1 and keyboard.W:
-                m_score += 1 
-                m_sayi = random.randint(1,4)  
-            elif m_sayi == 2 and keyboard.A:
-                m_score += 1
-                m_sayi = random.randint(1,4)  
-            elif m_sayi == 3 and keyboard.D:
-                m_score += 1
-                m_sayi = random.randint(1,4)  
-            elif m_sayi == 4 and keyboard.S:
-                m_score += 1
-                m_sayi = random.randint(1,4)  
-               
-        elif keyboard.up or keyboard.right or keyboard.left or keyboard.down:
-            if k_sayi == 1 and keyboard.up:
-                k_score += 1
-                k_sayi = random.randint(1,4)
-            elif k_sayi == 2 and keyboard.left:
-                k_score += 1
-                k_sayi = random.randint(1,4)
-            elif k_sayi == 3 and keyboard.right:
-                k_score += 1
-                k_sayi = random.randint(1,4)    
-            elif k_sayi == 4 and keyboard.down:
-                k_score += 1
-                k_sayi = random.randint(1,4)  
+        if kullanıcı_1 == True:
+            if keyboard.W or keyboard.A or keyboard.S or keyboard.D :
+                if keyboard.W:
+                    if m_sayi != 1:
+                        m_hata += 1
+                        m_sayi = random.randint(1,4) 
+                        old_m_sayi = 1
+                    elif m_sayi == 1:
+                        m_score += 1 
+                        old_m_sayi = 1
+                        m_sayi = random.randint(1,4)
+                     
+                elif keyboard.A:
+                    if m_sayi != 2:
+                        m_hata += 1
+                        old_m_sayi = 2
+                        m_sayi = random.randint(1,4)
+                    elif m_sayi ==2 :    
+                        m_score += 1
+                        old_m_sayi = 2
+                        m_sayi = random.randint(1,4)
+                      
+                elif keyboard.D:
+                    if m_sayi != 3:
+                        m_hata += 1
+                        old_m_sayi = 3
+                        m_sayi = random.randint(1,4)
+                    elif m_sayi == 3:
+                        m_score += 1
+                        old_m_sayi = 3
+                        m_sayi = random.randint(1,4)
+                elif keyboard.S:
+                    if m_sayi != 4:
+                        m_hata += 1
+                        old_m_sayi = 4
+                        m_sayi = random.randint(1,4)
+                    elif m_sayi != old_m_sayi:
+                        m_score += 1
+                        old_m_sayi = 4
+                        m_sayi = random.randint(1,4) 
+        if kullanıcı_2 == True:       
+            if keyboard.up or keyboard.right or keyboard.left or keyboard.down:
+                if keyboard.up:
+                    if k_sayi != 1:
+                        k_hata += 1
+                        old_k_sayi = 1
+                        k_sayi = random.randint(1,4)
+                    elif k_sayi == 1:
+                        k_score += 1
+                        old_k_sayi = 1
+                        k_sayi = random.randint(1,4)
+                elif keyboard.left:
+                    if k_sayi != 2:
+                        k_hata += 1
+                        old_k_sayi = 2
+                        k_sayi = random.randint(1,4)
+                    elif k_sayi == 2:
+                        k_score += 1
+                        old_k_sayi = 2  
+                        k_sayi = random.randint(1,4)
+                elif keyboard.right:
+                    if k_sayi != 3:
+                        k_hata += 1
+                        old_k_sayi = 3
+                        k_sayi = random.randint(1,4)
+                    elif k_sayi == 3:
+                        k_score += 1
+                        old_k_sayi = 3
+                        k_sayi = random.randint(1,4)
+                elif keyboard.down:
+                    if k_sayi != 4:
+                        k_hata += 1
+                        old_k_sayi = 4
+                        k_sayi = random.randint(1,4)
+                    elif k_sayi == 4:
+                        k_score += 1
+                        old_k_sayi = 4
+                        k_sayi = random.randint(1,4)
                       
 
 
 
 def update(dt):
-    global mod, time_left, highscore ,left_time
+    global mod, time_left, highscore ,left_time ,m_hata , m_sayi , k_hata , k_sayi , old_m_sayi , old_k_sayi
 
     if mod == 1:
         if time_left <= 0:
@@ -194,6 +253,10 @@ def update(dt):
                 highscore = m_score
             clock.unschedule(decrease_time)  # Zamanlayıcıyı durdur
     elif mod == 3:
+        if m_sayi == old_m_sayi:
+            m_sayi = random.randint(1,4)
+        if k_sayi == old_k_sayi:   
+            k_sayi = random.randint(1,4)    
         if left_time > 0:
             left_time -=1
                 
