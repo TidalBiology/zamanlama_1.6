@@ -41,6 +41,9 @@ old_m_sayi = 0
 old_k_sayi = 0
 m_hata = 0
 k_hata = 0
+m_sonuç = 0
+k_sonuç = 0
+winner = ""
 
 
 def draw():
@@ -102,145 +105,139 @@ def draw():
         screen.draw.text(f"Hata: {m_hata}", topleft=(50, 100), color="black", fontsize=45)
         screen.draw.text(f"Hata: {k_hata}", topleft=(1600, 100), color="black", fontsize=45) 
         screen.draw.text(f"Zaman: {int(left_time/ 60) }", (840, 50), fontsize=50, color="black")     
-    
+    elif mod == 4:
+        arkaplan.draw()
+        screen.draw.text(f"{winner} Kazandı", center=(WIDTH // 2, HEIGHT // 2 - 120), color="black", fontsize=60)
+        screen.draw.text("Tekrar Oyna: SPACE", center=(WIDTH // 2, HEIGHT // 2), color="black", fontsize=50)
+        screen.draw.text(f"1.Oyuncunun Skoru: {m_score}", center=(WIDTH // 2, HEIGHT // 2 + 100), color="black", fontsize=50)
+        screen.draw.text(f"2.Oyuncunun Skoru: {k_score}", center=(WIDTH // 2, HEIGHT // 2 + 170), color="black", fontsize=50)
+        screen.draw.text(f"Menüye dönmek için: R", center=(WIDTH // 2, HEIGHT // 2 + 240), color="black", fontsize=50)
 
 
 def on_key_down(key):
-    global m_score, m_sayi, death, mod, time_left, highscore , k_sayi , k_score , old_m_sayi , old_k_sayi, k_hata , m_hata
-
-    if mod == 0 and keyboard.Q:
-        mod = 1
-        start_timer()  # Zamanlayıcı başlat
-    elif mod == 0 and keyboard.E:
-        mod = 3    
-       
-    elif mod == 2 :
-        if keyboard.space:
+    global mod
+    
+    if mod == 0:  # Menü modu
+        if key == keys.Q:
+            mod = 1  # Tek oyunculu mod
+            start_timer()
+        elif key == keys.E:
+            mod = 3  # Çok oyunculu mod
+            
+    elif mod == 1:  # Tek oyunculu mod
+        handle_single_player(key)
+        
+    elif mod == 2:  # Oyun sonu
+        if key == keys.SPACE:
             mod = 1
-            reset_game()  # Oyunu sıfırla
-        elif keyboard.R:
-            mod = 0  
-            m_score = 0  
-
-    if mod == 1:
-        if keyboard.up or keyboard.right or keyboard.left or keyboard.down :
-
-            if m_sayi == 1 and keyboard.up:
-                m_score += 1
-                m_sayi = random.randint(1, 4)
-                reset_timer()  # Doğru tuş basılınca zamanı sıfırla
-            elif m_sayi == 2 and keyboard.left:
-                m_score += 1
-                m_sayi = random.randint(1, 4)
-                reset_timer()  # Doğru tuş basılınca zamanı sıfırla
-            elif m_sayi == 3 and keyboard.right:
-                m_score += 1
-                m_sayi = random.randint(1, 4)
-                reset_timer()  # Doğru tuş basılınca zamanı sıfırla
-            elif m_sayi == 4 and keyboard.down:
-                m_score += 1
-                m_sayi = random.randint(1, 4)
-                reset_timer()  # Doğru tuşa basılınca zamanı sıfırla
-            else:
-                if keyboard.space:
-                    m_sayi = random.randint(1, 4)  # Hata olsa bile yeni bir yön ver
-                else:
-                    death += 1  # Hata sayısını artır
-                    m_sayi = random.randint(1, 4)
-                    if death >= max_death:  # Maksimum hataya ulaşıldığında oyunu bitir
-                        if m_score > highscore:  # En yüksek skor kaydedilsin
-                            highscore = m_score
-                            mod = 2
-        elif keyboard.space:
-            m_sayi = random.randint(1, 4)                 
-
-        # Her 30 skorda bir zaman azalması
-        if  m_score % 30 == 0 and m_score != 0:
-            decrease_base_time()
-
-
-    if mod == 3:
-        if kullanıcı_1 == True:
-            if keyboard.W or keyboard.A or keyboard.S or keyboard.D :
-                if keyboard.W:
-                    if m_sayi != 1:
-                        m_hata += 1
-                        m_sayi = random.randint(1,4) 
-                        old_m_sayi = 1
-                    elif m_sayi == 1:
-                        m_score += 1 
-                        old_m_sayi = 1
-                        m_sayi = random.randint(1,4)
-                     
-                elif keyboard.A:
-                    if m_sayi != 2:
-                        m_hata += 1
-                        old_m_sayi = 2
-                        m_sayi = random.randint(1,4)
-                    elif m_sayi ==2 :    
-                        m_score += 1
-                        old_m_sayi = 2
-                        m_sayi = random.randint(1,4)
+            reset_game()
+        elif key == keys.R:
+            mod = 0
+            m_score = 0
+            
+    elif mod == 3:  # Çok oyunculu mod
+        handle_multi_player(key)
+    elif mod == 4:
+        if key == keys.R:
+            mod = 0
+        elif key == keys.SPACE:
+            mod = 3        
+    
                       
-                elif keyboard.D:
-                    if m_sayi != 3:
-                        m_hata += 1
-                        old_m_sayi = 3
-                        m_sayi = random.randint(1,4)
-                    elif m_sayi == 3:
-                        m_score += 1
-                        old_m_sayi = 3
-                        m_sayi = random.randint(1,4)
-                elif keyboard.S:
-                    if m_sayi != 4:
-                        m_hata += 1
-                        old_m_sayi = 4
-                        m_sayi = random.randint(1,4)
-                    elif m_sayi != old_m_sayi:
-                        m_score += 1
-                        old_m_sayi = 4
-                        m_sayi = random.randint(1,4) 
-        if kullanıcı_2 == True:       
-            if keyboard.up or keyboard.right or keyboard.left or keyboard.down:
-                if keyboard.up:
-                    if k_sayi != 1:
-                        k_hata += 1
-                        old_k_sayi = 1
-                        k_sayi = random.randint(1,4)
-                    elif k_sayi == 1:
-                        k_score += 1
-                        old_k_sayi = 1
-                        k_sayi = random.randint(1,4)
-                elif keyboard.left:
-                    if k_sayi != 2:
-                        k_hata += 1
-                        old_k_sayi = 2
-                        k_sayi = random.randint(1,4)
-                    elif k_sayi == 2:
-                        k_score += 1
-                        old_k_sayi = 2  
-                        k_sayi = random.randint(1,4)
-                elif keyboard.right:
-                    if k_sayi != 3:
-                        k_hata += 1
-                        old_k_sayi = 3
-                        k_sayi = random.randint(1,4)
-                    elif k_sayi == 3:
-                        k_score += 1
-                        old_k_sayi = 3
-                        k_sayi = random.randint(1,4)
-                elif keyboard.down:
-                    if k_sayi != 4:
-                        k_hata += 1
-                        old_k_sayi = 4
-                        k_sayi = random.randint(1,4)
-                    elif k_sayi == 4:
-                        k_score += 1
-                        old_k_sayi = 4
-                        k_sayi = random.randint(1,4)
-                      
-
-
+def handle_multi_player(key):
+    global m_score, k_score, m_hata, k_hata, m_sayi, k_sayi, old_m_sayi, old_k_sayi
+    
+    # 1. Oyuncu (WASD kontrolleri)
+    if key == keys.W:  # Yukarı
+        if m_sayi == 1:
+            m_score += 1
+        else:
+            m_hata += 1
+        old_m_sayi = 1
+        m_sayi = random.randint(1, 4)
+        
+    elif key == keys.A:  # Sol
+        if m_sayi == 2:
+            m_score += 1
+        else:
+            m_hata += 1
+        old_m_sayi = 2
+        m_sayi = random.randint(1, 4)
+        
+    elif key == keys.D:  # Sağ
+        if m_sayi == 3:
+            m_score += 1
+        else:
+            m_hata += 1
+        old_m_sayi = 3
+        m_sayi = random.randint(1, 4)
+        
+    elif key == keys.S:  # Aşağı
+        if m_sayi == 4:
+            m_score += 1
+        else:
+            m_hata += 1
+        old_m_sayi = 4
+        m_sayi = random.randint(1, 4)
+    
+    # 2. Oyuncu (Yön tuşları kontrolleri)
+    elif key == keys.UP:  # Yukarı
+        if k_sayi == 1:
+            k_score += 1
+        else:
+            k_hata += 1
+        old_k_sayi = 1
+        k_sayi = random.randint(1, 4)
+        
+    elif key == keys.LEFT:  # Sol
+        if k_sayi == 2:
+            k_score += 1
+        else:
+            k_hata += 1
+        old_k_sayi = 2
+        k_sayi = random.randint(1, 4)
+        
+    elif key == keys.RIGHT:  # Sağ
+        if k_sayi == 3:
+            k_score += 1
+        else:
+            k_hata += 1
+        old_k_sayi = 3
+        k_sayi = random.randint(1, 4)
+        
+    elif key == keys.DOWN:  # Aşağı
+        if k_sayi == 4:
+            k_score += 1
+        else:
+            k_hata += 1
+        old_k_sayi = 4
+        k_sayi = random.randint(1, 4)
+def handle_single_player(key):
+    global m_score, m_sayi, death, time_left, highscore, base_time
+    
+    if key == keys.UP and m_sayi == 1:
+        m_score += 1
+        m_sayi = random.randint(1, 4)
+        reset_timer()
+    elif key == keys.LEFT and m_sayi == 2:
+        m_score += 1
+        m_sayi = random.randint(1, 4)
+        reset_timer()
+    elif key == keys.RIGHT and m_sayi == 3:
+        m_score += 1
+        m_sayi = random.randint(1, 4)
+        reset_timer()
+    elif key == keys.DOWN and m_sayi == 4:
+        m_score += 1
+        m_sayi = random.randint(1, 4)
+        reset_timer()
+    elif key in (keys.UP, keys.DOWN, keys.LEFT, keys.RIGHT):
+        death += 1
+        m_sayi = random.randint(1, 4)
+        if death >= max_death:
+            if m_score > highscore:
+                highscore = m_score
+            mod = 2
 
 def update(dt):
     global mod, time_left, highscore ,left_time ,m_hata , m_sayi , k_hata , k_sayi , old_m_sayi , old_k_sayi
@@ -259,6 +256,14 @@ def update(dt):
             k_sayi = random.randint(1,4)    
         if left_time > 0:
             left_time -=1
+    if left_time == 0:
+        m_sonuç = m_score // m_hata
+        k_sonuç = k_score // k_hata
+        if m_sonuç > k_sonuç:
+            winner = "1. Oyuncu"
+        elif m_sonuç < k_sonuç:
+            winner = "2. Oyuncu"
+        mod = 4        
                 
             
 
